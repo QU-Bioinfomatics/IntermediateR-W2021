@@ -1,0 +1,191 @@
+---
+title: "Intermediate R Workshop - Jordan"
+author: "Jordan Rutherford"
+date: "08/02/2021"
+output: html_document
+---
+
+Hey everyone! Welcome to my section of the Intermediate R workshop. First we're going to go a bit into data manipulation with the dplyr package, then we're going to look at data visualization with ggplot. If you like working with these packages, consider taking the following Queen's courses:  
+
+BIOL243 - Intro to Statistics
+
+BIOL343 - Advanced Statistics
+
+BIOL432 - Computation and Big Data in Biology
+
+
+```{r}
+#loading my packages
+library(dplyr)
+library(ggplot2)
+```
+
+
+```{r}
+#loading in my dataset
+
+#what's my working directory?
+getwd()
+```
+
+
+We can set our working directory in a few ways:
+
+1. Session > Set Working Directory > Choose Directory
+2. Use setwd()
+
+---------------------------------------------------------------
+
+A bit about this dataset:  
+
+This is from an experiment done in June 2014 by researchers at Northeastern University on the effects of prey sound signals on predator foraging behaviour. In this study, the predators in question are three fishes (the hardhead catfish, black drum and oyster toadfish) and the prey is the mud crab which, in turn, feeds on clams. Both acoustic and water-borne chemical cues from the predatory fish were used as experimental variables. This dataset shows the effects of both treatments on the foraging behaviour of the crabs - i.e. how many clams were eaten.
+
+Hughes, A. Randall; Mann, David A.; Kimbro, David L. (2014), Data from: Predatory fish sounds can alter crab foraging behavior and influence bivalve abundance, Dryad, Dataset, https://doi.org/10.5061/dryad.v7g26
+
+
+```{r}
+#set working directory for THIS notebook chunk - can turn this off
+setwd("/Users/jordanrutherford/Desktop/Bioinformatics")
+
+#load in my data
+clamdata <- read.csv("acoustic_chemical.csv")
+```
+
+If I don't want to set a different working directory at all (eg. if I am working on projects for a club but my working directory is set to my BIOL243 folder and I don't want to change this), I can add the path name into the read.csv() function itself:
+
+```{r}
+clamdata <- read.csv("/Users/jordanrutherford/Desktop/Bioinformatics/acoustic_chemical.csv")
+```
+
+
+```{r}
+#looking at the structure of my data
+str(clamdata)
+```
+
+
+All of our numerical values are in integer form which is great for now.
+
+
+----------------------------------------------------------------------------
+
+
+## Cleaning up our data
+
+This data set is pretty clean, but for the sake of our workshop let's pretend it isn't. Sometimes in research there are NA and zero values in our data sets which can be hard to work with, especially when graphing and doing statistical tests.
+
+We can rename columns within our dataset. The general form when you're doing data science is to have variable names as all lowercase and separated by underscores. We can do that using dplyr's rename() function:
+
+```{r}
+clamdata <- clamdata %>% #piping function
+  rename(initial_clams = Initial.clams, #rename() uses (newname = oldname)
+         check_no = check.no,
+         total_clams_left = Total.clams.left,
+         clams_eaten = Clams.eaten,
+         time_min = time..min.)
+```
+
+
+Let's now check to make sure there are no NA values in our data set. We can do this a number of different ways:
+
+
+
+1. Find if any cell in the dataset contains an NA value
+
+```{r}
+is.na(clamdata)
+```
+
+This is useful for shorter datasets or if you're looking at a small subset, but obviously this is not the most helpful for us.
+
+
+
+2. Find if there are any NA values at all in the dataset
+
+```{r}
+any(is.na(clamdata))
+```
+
+So here we have the answer to our question - there are no NA values.
+
+Let's create some NA values. In our hypothetical new column I'm going to create some data to represent ______
+
+
+```{r}
+#how long is our dataset?
+length(clamdata$trial)
+```
+
+```{r}
+#add a new column to the dataset
+clamdata$example <- rnorm(114, mean = 10, sd = 2)
+
+#add some NA values
+clamdata$example[3] <- NA
+clamdata$example[15] <- NA
+clamdata$example[33] <- NA
+clamdata$example[105] <- NA
+clamdata$example[97] <- NA
+```
+
+
+Now let's see what happens when we look for NA values.
+
+```{r}
+any(is.na(clamdata))
+```
+
+Now R is telling us that we have some NA values but not where.
+
+
+3. Which cells contain the NA values?
+
+```{r}
+which(is.na(clamdata$example) == TRUE)
+```
+
+This works well if we already know what column contains the NA values, which we can elucidate using the previous few functions.
+
+- FILTER()
+- ARRANGE()
+- SELECT()
+- GROUP_BY()
+- MUTATE() AND TRANSMUTE()
+- SUMMARIZE()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
