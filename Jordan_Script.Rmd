@@ -14,6 +14,13 @@ BIOL343 - Advanced Statistics
 BIOL432 - Computation and Big Data in Biology
 
 
+A really good "cheat sheet" for dplyr is provided by RStudio:
+https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+
+As well as one for ggplot:
+https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
+
+
 ```{r}
 #loading my packages
 library(dplyr)
@@ -45,7 +52,7 @@ Hughes, A. Randall; Mann, David A.; Kimbro, David L. (2014), Data from: Predator
 
 ```{r}
 #set working directory for THIS notebook chunk - can turn this off
-setwd("/Users/jordanrutherford/Desktop/Bioinformatics")
+setwd("/Users/jordanrutherford/Desktop/Bioinformatics/IntermediateR-W2021")
 
 #load in my data
 clamdata <- read.csv("acoustic_chemical.csv")
@@ -54,7 +61,7 @@ clamdata <- read.csv("acoustic_chemical.csv")
 If I don't want to set a different working directory at all (eg. if I am working on projects for a club but my working directory is set to my BIOL243 folder and I don't want to change this), I can add the path name into the read.csv() function itself:
 
 ```{r}
-clamdata <- read.csv("/Users/jordanrutherford/Desktop/Bioinformatics/acoustic_chemical.csv")
+clamdata <- read.csv("/Users/jordanrutherford/Desktop/Bioinformatics/IntermediateR-W2021/acoustic_chemical.csv")
 ```
 
 
@@ -146,9 +153,75 @@ which(is.na(clamdata$example) == TRUE)
 
 This works well if we already know what column contains the NA values, which we can elucidate using the previous few functions.
 
-- FILTER()
-- ARRANGE()
-- SELECT()
+
+-----------------------------------------------
+
+# dplyr Basics
+
+1. filter()  
+
+Say we only want to view the observations made in tank 2. We can use the filter() function in dplyr to do this:
+
+```{r}
+tank2 <- filter(clamdata, tank == 2)
+tank2 #view our data
+```
+
+Note that the equals sign = is used to assign data to an object, similarly to <-. Here, the double equals sign == is an operator that denotes equality.  
+
+
+2. arrange()   
+
+Say we want to arrange our observations by the number of clams eaten in descending order. We can use the arrange() function with the desc() function as the second argument.
+
+```{r}
+desc_clams_eaten <- arrange(clamdata, desc(clams_eaten))
+desc_clams_eaten #view our data
+```
+
+We can also use the arrange() function to sort our data rows by the columns. For example, let's rearrange our data set based on tank and treatment type:
+
+```{r}
+tank_treat <- arrange(clamdata, tank, treat)
+tank_treat
+```
+
+3. select()  
+
+We can use select() to pull out columns of data:
+
+```{r}
+time <- select(clamdata, time_min)
+time
+```
+
+4. mutate()  
+
+Mutate() is a really useful function that allows us to create new columns in our data set. We can either create completely new columns or use the existing data to make a column.
+
+Let's say we wanted to make a column with data for the grazing rates of the crabs. The formula for this would be clams eaten divided by minutes, and we have both of those observations within our dataset.
+
+```{r}
+clamdata <- clamdata %>%
+  mutate(grazing_rate = clams_eaten/time_min)
+clamdata$grazing_rate
+```
+
+5. transmute()  
+
+This data is in clams per minute, but say we wanted it in clams per hour. We can do this using the transmute() function, which basically works the same as the mutate() function except that it only saves the new column.
+
+```{r}
+grz_rate_per_hr <- transmute(clamdata, grazing_rate = grazing_rate*60)
+grz_rate_per_hr
+```
+
+6. group_by() 
+
+
+
+
+
 - GROUP_BY()
 - MUTATE() AND TRANSMUTE()
 - SUMMARIZE()
