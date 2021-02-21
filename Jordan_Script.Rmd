@@ -5,7 +5,233 @@ date: "08/02/2021"
 output: html_document
 ---
 
-Hey everyone! Welcome to my section of the Intermediate R workshop. First we're going to go a bit into data manipulation with the dplyr package, then we're going to look at data visualization with ggplot. If you like working with these packages, consider taking the following Queen's courses:  
+# Intro            ------------------------------------------
+
+
+Hey everyone, welcome to the Intermediate R Workshop presented by QU Bioinformatics!
+
+This workshop will be divided into two sections:
+
+The first portion will be the lecture portion taught by myself, Jordan, and the second portion will be  project-based and led by our workshop mentors David and Joshua. Each section should take about an hour and we will have a break in the middle so we don't get too tired.
+
+Please note that it is highly recommended that you watch our R Basics Workshop beforehand so you are equipped with the fundamental R knowledge you need to participate today. Alternatively, if you have taken BIOL 243 (Introductory Biostatistics), you probably have enough basic R knowledge to get started here.
+
+You will also need to have RStudio downloaded on your computer.
+
+
+For my lecture portion, the material we will be covering is as follows:
+
+1. RStudio and R Notebooks
+2. Intro to data manipulation in dplyr
+3. Intro to data visualization in ggplot
+
+
+If you have any questions or would like me to change the pace I am speaking at, please let me know either in the chat or by raising your hand/unmuting yourself. I'm really excited to teach you guys what I know about R so let's get started!
+
+
+
+
+# R Notebooks  ----------------------------------------------------------------------
+
+
+If you aren't familiar already, the console I'm working with now is called RStudio. It is the same program as base R, but it's a little nicer on the eyes and, in my opinion, easier to use.
+
+Go to the top bar and then File > New File > R Notebook.
+
+This is a new R notebook file, and the extension for this file is .Rmd which stands for "R Markdown." As you can see, in an R Markdown file we can type normal text or create a "chunk" of code. For MacOS users you can use Option + Command + I, and for PC users you can use Command + Alt + I.
+
+```{r}
+
+```
+
+You can also go to the top of the R window and choose the green "Insert" button, but I find the other method a bit faster. 
+
+
+We can use special symbols to alter the plain text in an R Markdown file. This isn't as important for us today, but in general:
+
+# creates a title
+
+## creates a subtitle
+
+... this goes on with continuously decreasing text size down to #### (sub-sub-sub-subtitle)
+
+*text* creates italicized text
+
+**text** creates bold text
+
+> "text" creates a block quote
+
+
+There are many more tweaks you can make to your text as shown here:
+https://rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
+
+
+
+In code chunks, you can create a comment using #. This will not be run with your code.
+
+```{r}
+#this is a comment
+print("This is my code")
+```
+
+
+## Working directory and loading in .csv files
+
+In R, we work with .csv files a lot. R has a built-in function called read.csv() that allows us to read these types of files and import them into R.  
+
+For example, let's read in our data file for today. First, we need to create what is called a "working directory." This is basically a folder on our computer we will be pulling our data out of and writing our files into. We can change this later so it isn't as important what we set it to right now, but please create an empty folder now on the desktop of your computer. Name it something short with no spaces like "bioinfo".  
+
+Now that we have our folder created, we need to find the path name. On a Mac, you can drag the folder into your Terminal app (find this by clicking the magnifying glass in your toolbar and searching "Terminal") to find the path name. On a PC, you can hold down the Shift key, right click a folder and choose "Copy as Path". This puts the full path name for the folder you right-clicked in your clipboard.
+
+Make sure the file path is copied to your clipboard.
+
+Now, let's check our current working directory.
+
+```{r}
+getwd()
+```
+
+Mine is already set to the one I need, but yours will probably not be. To set a new working directory, we can use setwd("path.name").
+
+```{r}
+#setting my working directory
+setwd("/Users/jordanrutherford/Desktop/Bioinformatics/IntermediateR-W2021")
+#checking my working directory
+getwd()
+```
+
+We can also do Session > Set Working Directory > Choose Directory and choose the file you want.
+
+Now, manually put the .csv file you downloaded before the workshop into your working directory file. Then, load it into R:
+
+```{r}
+#loading in my data
+clamdata <- read.csv("acoustic_chemical.csv")
+```
+
+Congrats! If you did this correctly, you've loaded in your file. You should be able to see it if you look at the top right window under the "Environment" tab.
+
+
+
+
+# Intro to Regular Expressions (REGEX)   ------------------------------------------
+
+
+Regex is one of the most powerful tools you can learn in computing. It is comparable to Command + F or "find and replace," but much more robust and specific. Admittedly this can get pretty confusing, so we are just going to go over the basics for now.
+
+R makes some really good "cheat sheets" as I just mentioned earlier, and a good one for regular expressions is this one:
+
+https://rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf
+
+
+
+There are four main functions in regex:
+
+grep() and grepl() are like "find"
+  1. grep() returns all cell addresses matching your query
+  2. grepl() returns true/false associated with your query
+grep() and grepl() take on the form ("find this", in.this)
+
+sub() and gsub() are like "find and replace"
+  3. sub() only replaces the first match in each cell
+  4. gsub() replaces all matches
+sub() and gsub() take on the form ("find this", "replace with this", in.this)
+
+
+Let's create a short data vector to work with. Let's pretend we are a family going on a grocery shopping trip and we want to make a nice dinner for tonight (ask chat for grocery items).
+
+```{r}
+grocerylist <- c("Green beans", "broccoli", "Potatoes", "ground Beef", "Spaghetti", 
+                 "Apple pie", "Milk", "Green grapes", "green olives", "butter")
+```
+
+Let's say we want to find all of the ingredients that start with a "b".
+
+```{r}
+grep("b", grocerylist)
+```
+
+So we have at least one "b" in the cells 1, 2, and 10. If we go back and check, we can confirm that this is true. But why didn't it include ground Beef? It's because this query is case-sensitive. Let's check for upper-case B.
+
+```{r}
+grep("B", grocerylist)
+```
+
+
+What if we wanted to search for either upper or lowercase Bs? We can use the operator symbol "|", which means "or." There are a number of operators we can use in R such as:  
+
+"<"	less than   
+"<=" less than or equal to  
+">"	greater than  
+">="	greater than or equal to  
+"=="	exactly equal to  
+"!="	not equal to  
+"!x"	Not x  
+"x | y"	x OR y  
+"x & y"	x AND y  
+
+
+```{r}
+grep("b|B", grocerylist)
+```
+
+
+What if we wanted to change all of the uppercase Bs to lowercase?
+
+```{r}
+gsub("B", "b", grocerylist)
+```
+
+Note that these changes aren't applied to our data unless we assign this command to a new object (or reassign it to the same object as before). 
+
+
+
+What if we wanted to replace the lowercase bs at the beginning of the words to uppercase Bs?
+
+We can use something called an "anchor" which tells the function where to look in the string:
+
+^ Start of the string
+$ End of the string
+
+These ones are a bit more complex and employ the escape character \ which we will not be discussing:
+
+\\b Empty string at either edge of a word
+\\B NOT the edge of a word
+\\< Beginning of a word
+\\> End of a word
+
+
+```{r}
+#replace all of the bs at the beginning og the strings with Bs
+gsub("^b", "B", grocerylist)
+```
+
+If we want to search for any character besides a new line character (enter key), we can use .
+
+```{r}
+#replace all of the characters with asterisks
+gsub(".", "*", grocerylist)
+```
+
+Notice how it even replaced the spaces.
+
+
+
+That was just a quick example of what REGEX is and what it can do. We're now going to get into the main components of our workshop: dplyr and ggplot!
+
+
+
+
+> 5-10 minute break?
+
+
+
+
+# Dplyr Basics   ---------------------------------------------------------------
+
+
+
+Now we're going to go a bit into data manipulation with the dplyr package, then we're going to look at data visualization with ggplot. If you like working with these packages, consider taking the following Queen's courses:  
 
 BIOL243 - Intro to Statistics
 
@@ -28,45 +254,16 @@ library(ggplot2)
 ```
 
 
-```{r}
-#loading in my dataset
-
-#what's my working directory?
-getwd()
-```
-
-
-We can set our working directory in a few ways:
-
-1. Session > Set Working Directory > Choose Directory
-2. Use setwd()
-
----------------------------------------------------------------
-
 A bit about this dataset:  
 
-This is from an experiment done in June 2014 by researchers at Northeastern University on the effects of prey sound signals on predator foraging behaviour. In this study, the predators in question are three fishes (the hardhead catfish, black drum and oyster toadfish) and the prey is the mud crab which, in turn, feeds on clams. Both acoustic and water-borne chemical cues from the predatory fish were used as experimental variables. This dataset shows the effects of both treatments on the foraging behaviour of the crabs - i.e. how many clams were eaten.
+This is from an experiment done in June 2014 by researchers at Northeastern University on the effects of predator sound signals on prey foraging behaviour. In this study, the predators in question are three fishes (the hardhead catfish, black drum and oyster toadfish) and the prey is the mud crab which, in turn, feeds on clams. Both acoustic and water-borne chemical cues from the predatory fish were used as experimental variables. This dataset shows the effects of both treatments on the foraging behaviour of the crabs - i.e. how many clams were eaten.
 
 Hughes, A. Randall; Mann, David A.; Kimbro, David L. (2014), Data from: Predatory fish sounds can alter crab foraging behavior and influence bivalve abundance, Dryad, Dataset, https://doi.org/10.5061/dryad.v7g26
 
 
-```{r}
-#set working directory for THIS notebook chunk - can turn this off
-setwd("/Users/jordanrutherford/Desktop/Bioinformatics/IntermediateR-W2021")
-
-#load in my data
-clamdata <- read.csv("acoustic_chemical.csv")
-```
-
-If I don't want to set a different working directory at all (eg. if I am working on projects for a club but my working directory is set to my BIOL243 folder and I don't want to change this), I can add the path name into the read.csv() function itself:
 
 ```{r}
-clamdata <- read.csv("/Users/jordanrutherford/Desktop/Bioinformatics/IntermediateR-W2021/acoustic_chemical.csv")
-```
-
-
-```{r}
-#looking at the structure of my data
+#looking at the structure of my data - we loaded this in before
 str(clamdata)
 ```
 
@@ -81,7 +278,7 @@ All of our numerical values are in integer form which is great for now.
 
 This data set is pretty clean, but for the sake of our workshop let's pretend it isn't. Sometimes in research there are NA and zero values in our data sets which can be hard to work with, especially when graphing and doing statistical tests.
 
-We can rename columns within our dataset. The general form when you're doing data science is to have variable names as all lowercase and separated by underscores. We can do that using dplyr's rename() function:
+We can rename columns within our data set. The general form when you're doing data science is to have variable names as all lowercase and separated by underscores. We can do that using dplyr's rename() function:
 
 ```{r}
 clamdata <- clamdata %>% #piping function
@@ -93,21 +290,32 @@ clamdata <- clamdata %>% #piping function
 ```
 
 
-Let's now check to make sure there are no NA values in our data set. We can do this a number of different ways:
+## Converting between variable types:
+
+Another thing we can do is convert the "tank" variable into a factor. Right now it is set as an integer which is a problem because it is actually a categorical variable. R has a pretty simple function to do this for us:
 
 
+```{r}
+clamdata$tank <- as.factor(clamdata$tank)
+```
 
-1. Find if any cell in the dataset contains an NA value
+
+## Dealing with NA values
+
+Let's now check to make sure there are no NA values in our data set. We can do this a number of different ways:  
+
+
+1. Find if any cell in the data set contains an NA value
 
 ```{r}
 is.na(clamdata)
 ```
 
-This is useful for shorter datasets or if you're looking at a small subset, but obviously this is not the most helpful for us.
+This is useful for shorter data sets or if you're looking at a small subset, but obviously this is not the most helpful for us.
 
 
 
-2. Find if there are any NA values at all in the dataset
+2. Find if there are any NA values at all in the data set
 
 ```{r}
 any(is.na(clamdata))
@@ -115,7 +323,7 @@ any(is.na(clamdata))
 
 So here we have the answer to our question - there are no NA values.
 
-Let's create some NA values. In our hypothetical new column I'm going to create some data to represent ______
+Let's create some NA values. In our hypothetical new column I'm going to create some fake data:
 
 
 ```{r}
@@ -125,6 +333,7 @@ length(clamdata$trial)
 
 ```{r}
 #add a new column to the dataset
+#rnorm() generates data randomly from a normal curve with the parameters i've specified, with 114 being length
 clamdata$example <- rnorm(114, mean = 10, sd = 2)
 
 #add some NA values
@@ -154,9 +363,8 @@ which(is.na(clamdata$example) == TRUE)
 This works well if we already know what column contains the NA values, which we can elucidate using the previous few functions.
 
 
------------------------------------------------
 
-# dplyr Basics
+## Essential functions
 
 1. filter()  
 
@@ -195,11 +403,20 @@ time <- select(clamdata, time_min)
 time
 ```
 
+Alternatively, if we wanted to select columns of data to appear at the beginning of our dataset without losing our other columns, we can pair this with the everything() function:
+
+```{r}
+time_water <- select(clamdata, time_min, water, everything())
+head(time_water)
+```
+
+
+
 4. mutate()  
 
 Mutate() is a really useful function that allows us to create new columns in our data set. We can either create completely new columns or use the existing data to make a column.
 
-Let's say we wanted to make a column with data for the grazing rates of the crabs. The formula for this would be clams eaten divided by minutes, and we have both of those observations within our dataset.
+Let's say we wanted to make a column with data for the grazing rates of the crabs. The formula for this would be clams eaten divided by minutes, and we have both of those observations within our data set.
 
 ```{r}
 clamdata <- clamdata %>%
@@ -216,21 +433,248 @@ grz_rate_per_hr <- transmute(clamdata, grazing_rate = grazing_rate*60)
 grz_rate_per_hr
 ```
 
-6. group_by() 
+
+6. group_by() and summarize()
+
+Let's say we want to find the mean number of clams eaten for the crabs but we want to see these values grouped by treatment type and tank number.
+
+```{r}
+treat_tank_means <- clamdata %>%
+  group_by(treat, tank) %>%
+  summarize(mean_clams_eaten = mean(clams_eaten))
+treat_tank_means
+```
+
+As you can see, I didn't add this to my data set as a new column because it has a length of 19 which is different from the length of my data set (114).   
+
+
+
+The summarize() function works similarly to the mutate() function in that you can create new variables within it. There are a variety of other base R functions we can use within summarize() as well such as:
+
+
+sum() returns the sum of all specified values
+abs() returns absolute values
+sqrt() returns square root
+ceiling() rounds up to closest whole number
+floor() rounds down to closest whole number
+signif(pi, digits = 3) rounds pi to 3 significant digits
+log() and log10() log transforms the data
+
+
+> NOTE: If we have NA values in our dataset, we can also use the argument na.rm = TRUE within our summarize() function to remove these for us. If we do not remove NAs, summarize() WILL NOT WORK
+
+
+For example, how would we find the total number of clams eaten by crabs in each treatment?
+
+```{r}
+clamdata %>%
+  group_by(treat) %>%
+  summarize(total_no = sum(clams_eaten))
+```
 
 
 
 
 
-- GROUP_BY()
-- MUTATE() AND TRANSMUTE()
-- SUMMARIZE()
+
+
+
+# Ggplot Basics        -------------------------------------------------
+
+
+
+Now we're going to get into visualization. There are a few basic plot types we can make with ggplot:
+
+1. Histograms
+2. Scatterplots
+3. Line graphs
+4. Bar charts
+5. Box plots
+
+Ggplot uses something called "geoms" to create figures, which essentially act as layers to your script. You add them together using the + symbol.
+
+We also use aes() to define something called an aesthetic mapping statement. This basically tells ggplot which data to assign to the x and y variables, as well as colour and fill which we'll get into later.
+
+
+## Histograms 
+
+Histograms usually represent the frequency of an observation occurring in the data. In other words, our x variable is going to be our variable of interest (usually continuous) while our y variable will be the "density" of that variable, or the frequency of its occurrence at our specified values. 
+
+This will give us the *distribution* of our variable.
+
+Let's say we want to see the distribution of our "check no" variable, even though this is a discrete variable. This should be a uniform distribution (all observations occur the same number of times) because there should have been equal trials conducted for each tank. We can use ..density.. as our 
+
+```{r}
+ggplot(clamdata) +
+  geom_histogram(aes(x = check_no, y = ..density..))
+```
+
+Here we can see that the x-axis is showing us our check numbers from 1-3. We can adjust how these are spaced out by adjusting the "bin width" later on, but for now this provides us a pretty good, albeit brief visual representation of our variable. It is indeed uniformly distributed because all values occur the same amount of times proportionally (which is what density shows us).
+
+
+Let's check for clams eaten:
+
+```{r}
+ggplot(clamdata) +
+  geom_histogram(aes(x = clams_eaten, y = ..density..))
+```
+
+This variable does not appear to be distributed uniformly, but rather slightly log-normally. This is fine for now. Most of the time, we can see that a lower number of clams was eaten.
+
+
+## Scatterplots
+
+Scatterplots are useful for plotting two numerical variables against each other. We can tell ggplot to make a scatterplot by using the geom_point() function.
+
+Let's make a scatterplot of clams eaten by time.
+
+```{r}
+ggplot(clamdata) +
+  geom_point(aes(x = time_min, y = clams_eaten))
+```
 
 
 
 
+## Line graphs
+
+To make a line graph, we follow the same rules as the scatterplot (numerical vs numerical) but we add another line linking the geom_points with the function geom_smooth().
+
+> NOTE: using aes() in the initial ggplot() line applies this aesthetic mapping to all elements below unless otherwise specified, making it helpful for figures where we are using lots of geoms
+
+Let's make a line graph of clams eaten by grazing rates (this should be a roughly proportional relationship).
+
+```{r}
+ggplot(clamdata, aes(x = grazing_rate, y = clams_eaten)) +
+  geom_point() +
+  geom_smooth(method = "lm") #method = linear model
+```
+
+This gives us a pretty good line graph, but normally I like to turn the standard error margin off unless I really need it because it tends to clutter our figure up a bit:
+
+```{r}
+ggplot(clamdata, aes(x = grazing_rate, y = clams_eaten)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) #method = linear model, standard error = false
+```
+
+> NOTE: if you're lazy like me, instead of typing out "TRUE" and "FALSE" R will recognize "T" and "F" :)
 
 
+## Bar charts
+
+Bar charts are good for plotting a continuous variable against a discrete variable. To make one, we use geom_bar().
+
+Let's plot clams eaten over treatment types:
+
+```{r}
+ggplot(clamdata, aes(x = treat, y = clams_eaten)) +
+  geom_bar(stat = "identity")
+```
+
+As we can see, overall the most clams were eaten in the silent treatment.
+
+
+
+## Box plots
+
+Box plots are also a really good option for discrete x variables and continuous y variables. In our last bar plot, all of the y values for each observation were added together and stacked on top of each other according to treatment. In a box plot, we can see several other parameters such as median, interquartile range and any outliers. We can do this using geom_boxplot()
+
+```{r}
+ggplot(clamdata, aes(x = treat, y = clams_eaten)) +
+  geom_boxplot()
+```
+
+Here the dark lines represent the median, the lower and upper "hinges" (ends of the white boxes) represent the first and third quartiles, and the whiskers represent 1.5x the interquartile range in either direction. The lone dots represent outlier points as we can see in both the sound and sound/water treatments.
+
+
+
+## Pretty graphs! Woo!
+
+Now let's get into adding colours, shapes and other details to our plots. This can be helpful if we have three or more variables we are trying to analyze, if we want to annotate our plot or if we are just trying to create a publication-quality graph for use in an assignment.
+
+Here's a nice list of colours we can use in R:
+
+http://sape.inf.usi.ch/quick-reference/ggplot2/colour
+
+
+A note on "colour" vs "fill": usually in ggplot we use "colour" for things like lines and points, but "fill" for things like boxes and bars or large areas. If we use "colour" on a box or bar geom, it will only change the colour of the outline of that shape instead of the fill colour.
+
+Eg. Let's plot the treatment- and tank-sorted eaten clam means we calculated earlier:
+
+```{r}
+ggplot(treat_tank_means, aes(x = treat, y = mean_clams_eaten, fill = tank)) +
+  geom_bar(stat = "identity")
+```
+
+This shows us our three different variables: mean clams eaten, treatment type and tank number. We can see proportionally how many clams were eaten by each tank across each treatment type.
+
+How do we change axis titles? What about colours and legends? Here we get into scales, which basically tell R which data to assign to the visual components of your aesthetic mapping statements. We can have scales for discrete, binned or continuous variables and we can manipulate things like the x and y axes, the colours and more.
+
+Examples:
+
+scale_x_discrete()
+scale_colour_binned()
+scale_y_continuous()
+
+Let's try changing the axis titles and colours of our line graph, but I'm going to also add treatment type as a variable and we're using colour instead of fill because the geom is a point:
+
+```{r}
+ggplot(clamdata, aes(x = grazing_rate, y = clams_eaten, colour = treat)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Looks pretty good. Let's add our details:
+
+```{r}
+ggplot(clamdata, aes(x = grazing_rate, y = clams_eaten, colour = treat)) +
+  geom_point(alpha = 0.6, size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE, colour = "brown4", lwd = 0.5) +
+  scale_x_continuous(name = "Grazing Rate (clams eaten per minute)") +
+  scale_y_continuous(name = "Clams Eaten") +
+  scale_color_manual(name = "Treatment Type",
+                     labels = c("Silence", "Predator Sound", "Sound and Water", "Water"),
+                     values = c("burlywood", "palegreen4", "violetred3", "steelblue4")) +
+  ggtitle("Clams Eaten Across Crab Grazing Rates By Treatment Type") +
+  theme_classic()
+
+```
+
+Wow, that looks pretty different! So what did I do?
+
+- changed the alpha values and sizes of the geom_point to make it easier to see compact data. Alpha values can be toggled on a scale from 0 to 1.
+- changed the colour and line width of the line of best fit
+- added x and y axis titles using scales
+- added legend title, labels and colours using scale_colour_manual (you need to use "manual" if you are going to change the colours)
+- added a figure title using ggtitle()
+- added a theme!
+
+What's a theme? Glad you asked! Themes are basically default settings you can apply to your graph. These are super helpful for if you need to create multiple graphs for one project and you want them all to look homogeneous. You can create your own, use one built into ggplot (just type in theme_ and a bunch should pop up) or you can download packages to get even MORE themes!! Here's one of my favourites:
+
+
+```{r}
+library(ggthemes)
+```
+
+
+Let's check it out:
+
+
+```{r}
+ggplot(clamdata, aes(x = grazing_rate, y = clams_eaten, colour = treat)) +
+  geom_point(alpha = 0.6, size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE, colour = "brown4", lwd = 0.5) +
+  scale_x_continuous(name = "Grazing Rate (clams eaten per minute)") +
+  scale_y_continuous(name = "Clams Eaten") +
+  scale_color_manual(name = "Treatment Type",
+                     labels = c("Silence", "Predator Sound", "Sound and Water", "Water"),
+                     values = c("burlywood", "palegreen4", "violetred3", "steelblue4")) +
+  ggtitle("Clams Eaten Across Crab Grazing Rates By Treatment Type") +
+  theme_hc()
+```
+
+Cool! It's definitely worth it to experiment with these to see what you like best.
 
 
 
