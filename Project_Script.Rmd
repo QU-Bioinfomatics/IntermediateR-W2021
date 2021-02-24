@@ -1,0 +1,69 @@
+---
+title: "Intermediate R Project Section"
+author: "QU Bioinformatics"
+date: "2/24/2021"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+## Intro
+Welcome to the project section of the Intermediate R Workshop put on by the Queen's Bioinformatics Club! Here we will present a series of questions which will apply new skills taught in the lecture section of the workshop.
+
+## Getting Started
+### Setting up our enviorment ###
+We will be using three packages, `dplyr`, `tidyr`, and `ggplot2`. Remove the commenting on the the install functions and run the code block to install them (or use the package manager) if they are not installed already, otherwise, just run the code block unmodified 
+```{r}
+# uncomment these if they are not installed already. If the libray functions below do not throw an error, they are all installed.
+#install.packages("ggplot2")
+#install.packages("tidyr")
+#install.packages("dplyr")
+
+#loading my packages
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+```
+
+We will be using the *TidyTuesday* plastics data set for this part of the workshop. We will be loading it directly from the URL below, but it can also be found on their GitHub repository.
+```{r}
+raw_data <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-01-26/plastics.csv"
+plastics <- read.csv(url(raw_data))
+```
+
+Lets make sure the data was loaded in, and also check the data attributes. Within the "environment" in RStudio, we can also select 'data' which will open a new tab, showing the data set as if we were viewing it in Excel.
+```{r}
+colnames(plastics)
+```
+
+Now that we confirmed that our data set has loaded in properly, we should count up the number of `na` occurrences in our data. We will pipeline with dplyr to do this. You might need this information to process data.
+```{r}
+plastics %>%
+  select(everything()) %>%
+  summarize_all(funs(sum(is.na(.))))
+```
+
+Here we have provided the code to transform our data into long form. Take a look at the data object and see if you notice any differences. For the following questions you can choose to use the original or long form data to answer the questions.
+```{r}
+plastics_long <- plastics %>%
+  pivot_longer(hdpe:pvc, names_to = "plastic_type", values_to = "trash_gathered")
+```
+
+## Questions
+Now that all your data is processed, you are ready to tackle some questions. Do your best with this, and refer back to the lecture portion. Good luck!
+
+### Question 1 ###
+Notice that the *parent_company* `Grand Total` in 2019 represents the **total** garbage picked up for **each** respective country in 2019. An error occurred during data gathering and the *parent_company* "Grand Total" was **changed to** `null` for data collected in 2020. Rename the parent_company null to a more descriptive name.
+
+### Question 2 ###
+How much garbage was picked up in 2019 **compared to** 2020? Is there a **significant** difference? Does the ratio of plastic types change from year to year? 
+
+### Question 3 ###
+Is there a **correlation** between the number of events and the total plastic picked, the number of volunteers and the amount of plastic picked up? 
+
+### Question 4 ###
+What are the **top 5** countries ranked by garbage picked up? Use a stacked bar graph using ggplot2 to visualize the proportions of each type of plastic that makes up each country's grand total.
+
+### Question 5 ###
+What are the **top 10** polluting companies? If we define *local polluters* as having half of their garbage picked up in one country and *international polluters* as having their garbage more than half of their garbage picked up in various countries, **which of these companies** are local polluters which are international?
