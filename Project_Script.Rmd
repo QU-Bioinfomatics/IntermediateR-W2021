@@ -3,8 +3,8 @@ title: "Intermediate R Project Section"
 author: "QU Bioinformatics"
 date: "2/24/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
   word_document: default
 ---
 
@@ -14,7 +14,7 @@ Welcome to the project section of the Intermediate R Workshop put on by the Quee
 ## Getting Started
 ### Setting up our enviorment ###
 We will be using three packages, `dplyr`, `tidyr`, and `ggplot2`. Remove the commenting on the the install functions and run the code block to install them (or use the package manager) if they are not installed already, otherwise, just run the code block unmodified 
-```{r}
+```{r message=FALSE}
 # uncomment these if they are not installed already. If the libray functions below do not throw an error, they are all installed.
 #install.packages("ggplot2")
 #install.packages("tidyr")
@@ -27,25 +27,25 @@ library(dplyr)
 ```
 
 We will be using the *TidyTuesday* plastics data set for this part of the workshop. We will be loading it directly from the URL below, but it can also be found on their GitHub repository.
-```{r}
+```{r message=FALSE}
 raw_data <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-01-26/plastics.csv"
 plastics <- read.csv(url(raw_data))
 ```
 
-Lets make sure the data was loaded in, and also check the data attributes. Within the "environment" in RStudio, we can also select 'data' which will open a new tab, showing the data set as if we were viewing it in Excel.
-```{r}
-colnames(plastics)
+Lets make sure the data was loaded in by previewing the first few lines of the data set. Within the "environment" in RStudio, we can also select 'data' which will open a new tab, showing the data set as if we were viewing it in Excel.
+```{r results='hide'}
+head(plastics)
 ```
 
 Now that we confirmed that our data set has loaded in properly, we should count up the number of `na` occurrences in our data. We will pipeline with dplyr to do this. You might need this information to process data.
-```{r}
+```{r warning=FALSE, results='hide'}
 plastics %>%
   select(everything()) %>%
   summarize_all(funs(sum(is.na(.))))
 ```
 
 Here we have provided the code to transform our data into long form. Take a look at the data object and see if you notice any differences. For the following questions you can choose to use the original or long form data to answer the questions.
-```{r}
+```{r message=FALSE}
 plastics_long <- plastics %>%
   pivot_longer(hdpe:pvc, names_to = "plastic_type", values_to = "trash_gathered")
 ```
